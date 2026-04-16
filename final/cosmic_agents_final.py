@@ -189,6 +189,7 @@ class MakePackPlanTool(Tool):
         seg   = json.loads(segment_json)["segment"]
 
         items = [i for it in order["items"] for i in [it] * int(it["qty"])]
+
         total_w = float(sum(i["weight_kg"] for i in items))
         largest = max(items, key=lambda x: volume_cm3(tuple(x["dims_cm"])))
         largest_dims = tuple(largest["dims_cm"])
@@ -421,8 +422,13 @@ def last_json(agent_obj) -> str:
     for step in reversed(agent_obj.memory.steps):
         if isinstance(step, ActionStep):
             obs = step.observations
+            if obs is None: 
+                continue
+
             obs_list = [obs] if isinstance(obs, str) else obs
             for c in obs_list:
+                if not isinstance(c, str):
+                    continue
                 try:
                     json.loads(c)
                     return c
