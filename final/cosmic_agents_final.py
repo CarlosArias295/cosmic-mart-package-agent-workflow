@@ -627,6 +627,44 @@ TEST_ORDERS = [
         ],
         "shipping": {"zone": "national", "service": "standard"}
     },
+    
+    # 9) Tests Unknown category + unknown fragility 
+    {
+        "order_id": "EDGE-UNKNOWN-01",
+        "items": [
+            {"sku": "SKU-MYSTERY", "qty": 1, "dims_cm": [15, 10, 8], "weight_kg": 0.7, "fragility": "VERY_BREAKABLE", "category": "collectible"}
+        ],
+        "shipping": {"zone": "regional", "service": "standard"}
+    },
+
+    # 10) Tests Exact box boundary
+    {
+        "order_id": "EDGE-BOUNDARY-01",
+        "items": [
+            {"sku": "SKU-BOUNDARY", "qty": 1, "dims_cm": [20, 15, 10], "weight_kg": 1.9, "fragility": "LOW", "category": "general"}
+        ],
+        "shipping": {"zone": "local", "service": "standard"}
+    },
+
+    # 11) Tests large quantity expansion case
+    {
+        "order_id": "EDGE-QTY-01",
+        "items": [
+            {"sku": "SKU-CAN", "qty": 25, "dims_cm": [8, 8, 12], "weight_kg": 0.5, "fragility": "LOW", "category": "home"}
+        ],
+        "shipping": {"zone": "regional", "service": "standard"}
+    },
+
+    # 12) Tests Restricted items, battery should push RESTRICTED
+    {
+        "order_id": "EDGE-PRECEDENCE-01",
+        "items": [
+            {"sku": "SKU-SHIRT", "qty": 1, "dims_cm": [25, 20, 3], "weight_kg": 0.3, "fragility": "LOW", "category": "apparel"},
+            {"sku": "SKU-BOOK", "qty": 1, "dims_cm": [22, 15, 3], "weight_kg": 0.5, "fragility": "LOW", "category": "books"},
+            {"sku": "SKU-BATTERY", "qty": 1, "dims_cm": [10, 7, 4], "weight_kg": 0.4, "fragility": "LOW", "category": "battery"}
+        ],
+        "shipping": {"zone": "regional", "service": "standard"}
+    },
 ]
 
 if __name__ == "__main__":
