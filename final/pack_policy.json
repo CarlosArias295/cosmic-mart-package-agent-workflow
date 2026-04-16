@@ -1,12 +1,12 @@
 {
   "split_thresholds_kg": {
-    "FRAGILE": 8.0,
+    "FRAGILE": 4.0,
     "GENERAL": 15.0,
     "RESTRICTED": 0.0,
     "SOFTGOODS": 999.0,
     "FLAT": 999.0
   },
-  "weight_safety_buffer_pct": 0.05,
+  "weight_safety_buffer_pct": 0.2,
   "filler_by_segment": {
     "FRAGILE": "foam",
     "GENERAL": "air_pillow",

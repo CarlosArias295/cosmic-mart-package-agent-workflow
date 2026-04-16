@@ -196,6 +196,7 @@ class MakePackPlanTool(Tool):
         # Preserve refined behavior: policy-aware smallest viable box + policy thresholds for split
         box = choose_box(total_w, largest_dims)
         split = (seg == "RESTRICTED") or (total_w > POLICY["split_thresholds_kg"].get(seg, 15.0))
+        #split = False
 
         filler_name = POLICY["filler_by_segment"].get(seg, "air_pillow")
         filler = next(f for f in FILLER_CATALOG if f["filler"] == filler_name)
@@ -339,7 +340,8 @@ class ValidatePackPlanTool(Tool):
 
         triggers: List[str] = []
         decision = "APPROVE"
-
+        print("VALIDATOR CHECKS:")
+        print(total_w, box["max_w_kg"], POLICY["weight_safety_buffer_pct"])
         if total_w > float(box["max_w_kg"]):
             triggers.append("exceeds box max")
             decision = "REVISE"
@@ -627,6 +629,24 @@ TEST_ORDERS = [
         ],
         "shipping": {"zone": "national", "service": "standard"}
     },
+
+    # 9) RESTRICTED, heavy, should trigger both "exceeds box max" and "fragile+heavy" if split_shipment=False; tests multiple triggers and fixes
+    {
+        "order_id": "REVISE-OVERMAX-02",
+        "items": [
+            {
+                "sku": "SKU-DENSE-ENGINE",
+                "qty": 1,
+                "dims_cm": [34, 24, 14],
+                "weight_kg": 40.0,
+                "fragility": "LOW",
+                "category": "sports"
+            }
+        ],
+        "shipping": {}
+    }
+
+
 ]
 
 if __name__ == "__main__":
