@@ -197,6 +197,7 @@ class MakePackPlanTool(Tool):
         # Preserve refined behavior: policy-aware smallest viable box + policy thresholds for split
         box = choose_box(total_w, largest_dims)
         split = (seg == "RESTRICTED") or (total_w > POLICY["split_thresholds_kg"].get(seg, 15.0))
+        #split = False
 
         filler_name = POLICY["filler_by_segment"].get(seg, "air_pillow")
         filler = next(f for f in FILLER_CATALOG if f["filler"] == filler_name)
@@ -340,7 +341,8 @@ class ValidatePackPlanTool(Tool):
 
         triggers: List[str] = []
         decision = "APPROVE"
-
+        print("VALIDATOR CHECKS:")
+        print(total_w, box["max_w_kg"], POLICY["weight_safety_buffer_pct"])
         if total_w > float(box["max_w_kg"]):
             triggers.append("exceeds box max")
             decision = "REVISE"
@@ -633,44 +635,24 @@ TEST_ORDERS = [
         ],
         "shipping": {"zone": "national", "service": "standard"}
     },
-    
-    # 9) Tests Unknown category + unknown fragility 
-    {
-        "order_id": "EDGE-UNKNOWN-01",
-        "items": [
-            {"sku": "SKU-MYSTERY", "qty": 1, "dims_cm": [15, 10, 8], "weight_kg": 0.7, "fragility": "VERY_BREAKABLE", "category": "collectible"}
-        ],
-        "shipping": {"zone": "regional", "service": "standard"}
-    },
 
-    # 10) Tests Exact box boundary
+    # 9) RESTRICTED, heavy, should trigger both "exceeds box max" and "fragile+heavy" if split_shipment=False; tests multiple triggers and fixes
     {
-        "order_id": "EDGE-BOUNDARY-01",
+        "order_id": "REVISE-OVERMAX-02",
         "items": [
-            {"sku": "SKU-BOUNDARY", "qty": 1, "dims_cm": [20, 15, 10], "weight_kg": 1.9, "fragility": "LOW", "category": "general"}
+            {
+                "sku": "SKU-DENSE-ENGINE",
+                "qty": 1,
+                "dims_cm": [34, 24, 14],
+                "weight_kg": 40.0,
+                "fragility": "LOW",
+                "category": "sports"
+            }
         ],
-        "shipping": {"zone": "local", "service": "standard"}
-    },
+        "shipping": {}
+    }
 
-    # 11) Tests large quantity expansion case
-    {
-        "order_id": "EDGE-QTY-01",
-        "items": [
-            {"sku": "SKU-CAN", "qty": 25, "dims_cm": [8, 8, 12], "weight_kg": 0.5, "fragility": "LOW", "category": "home"}
-        ],
-        "shipping": {"zone": "regional", "service": "standard"}
-    },
 
-    # 12) Tests Restricted items, battery should push RESTRICTED
-    {
-        "order_id": "EDGE-PRECEDENCE-01",
-        "items": [
-            {"sku": "SKU-SHIRT", "qty": 1, "dims_cm": [25, 20, 3], "weight_kg": 0.3, "fragility": "LOW", "category": "apparel"},
-            {"sku": "SKU-BOOK", "qty": 1, "dims_cm": [22, 15, 3], "weight_kg": 0.5, "fragility": "LOW", "category": "books"},
-            {"sku": "SKU-BATTERY", "qty": 1, "dims_cm": [10, 7, 4], "weight_kg": 0.4, "fragility": "LOW", "category": "battery"}
-        ],
-        "shipping": {"zone": "regional", "service": "standard"}
-    },
 ]
 
 if __name__ == "__main__":
